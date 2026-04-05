@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal del Cliente — CAOBA de Novaterra P.H.</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#9600C1;--dark:#420049;--accent:#C9664F;
+  --bg:#0D0D12;--surface:#16161F;--surface2:#1E1E2A;
+  --text:#E8E8F0;--muted:#8888A0;
+  --success:#4ADE80;--warning:#FACC15;--danger:#EF4444;
+  --radius:12px;--radius-sm:8px;
+}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{
+  font-family:'SF Pro Display',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.6;
+  min-height:100vh;
+}
+a{color:var(--primary);text-decoration:none}
+
+/* Layout */
+.container{max-width:900px;margin:0 auto;padding:0 20px}
+.section{margin-bottom:40px}
+.section-title{
+  font-size:1.15rem;font-weight:700;color:var(--text);
+  margin-bottom:16px;letter-spacing:0.02em;
+  padding-bottom:8px;border-bottom:1px solid var(--surface2);
+}
+
+/* Header */
+.header{
+  padding:32px 0 24px;
+  border-bottom:1px solid var(--surface2);
+  margin-bottom:40px;
+}
+.header-top{
+  display:flex;align-items:center;gap:20px;
+  flex-wrap:wrap;margin-bottom:20px;
+}
+.logo-ihc{height:240px;width:auto;object-fit:contain}
+.header-info{flex:1;min-width:200px}
+.badge{
+  display:inline-block;
+  background:var(--dark);color:var(--primary);
+  font-size:.75rem;font-weight:700;letter-spacing:.06em;
+  padding:4px 12px;border-radius:20px;
+  border:1px solid var(--primary);
+  margin-bottom:10px;text-transform:uppercase;
+}
+.project-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo-caoba{height:80px;width:80px;object-fit:cover;border-radius:var(--radius-sm)}
+.project-name{font-size:1.5rem;font-weight:700;color:var(--text)}
+.project-sub{font-size:.95rem;color:var(--muted);margin-top:2px}
+.project-contract{font-size:.8rem;color:var(--muted);margin-top:4px;font-family:monospace;letter-spacing:.04em}
+
+/* Cards */
+.card{
+  background:var(--surface);border-radius:var(--radius);
+  padding:24px;border:1px solid var(--surface2);
+}
+.card-accent{border-left:4px solid var(--primary)}
+
+/* Estado General */
+.estado-general{text-align:center;padding:32px 24px}
+.estado-label{font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.estado-value{font-size:1.35rem;font-weight:700;color:var(--primary);margin-bottom:4px}
+.estado-fase{font-size:1rem;color:var(--accent);font-weight:600;margin-bottom:20px}
+.progress-track{
+  background:var(--surface2);border-radius:20px;height:10px;
+  width:100%;max-width:500px;margin:0 auto 8px;overflow:hidden;
+}
+.progress-fill{
+  height:100%;border-radius:20px;
+  background:linear-gradient(90deg,var(--primary),var(--accent));
+  transition:width .4s ease;
+}
+.progress-label{font-size:.85rem;color:var(--muted)}
+
+/* KPI Grid */
+.kpi-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;
+}
+.kpi-card{
+  background:var(--surface);border-radius:var(--radius);
+  padding:20px;text-align:center;border:1px solid var(--surface2);
+}
+.kpi-value{font-size:1.75rem;font-weight:800;color:var(--text);line-height:1.2}
+.kpi-value.highlight{color:var(--primary)}
+.kpi-value.warn{color:var(--warning)}
+.kpi-value.danger{color:var(--accent)}
+.kpi-label{font-size:.8rem;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.04em}
+
+/* Timeline / Stepper */
+.stepper{list-style:none;padding:0}
+.stepper li{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:12px 0;position:relative;
+}
+.stepper li:not(:last-child){border-left:2px solid var(--surface2);margin-left:11px;padding-left:26px}
+.stepper li:last-child{margin-left:11px;padding-left:26px}
+.step-icon{
+  width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:700;flex-shrink:0;
+  position:absolute;left:0;top:12px;
+}
+.step-done .step-icon{background:var(--success);color:#0D0D12}
+.step-next .step-icon{background:var(--primary);color:#fff;box-shadow:0 0 0 4px rgba(150,0,193,.25)}
+.step-pending .step-icon{background:var(--surface2);color:var(--muted);border:2px solid var(--muted)}
+.step-title{font-weight:600;font-size:.95rem}
+.step-done .step-title{color:var(--success)}
+.step-next .step-title{color:var(--primary)}
+.step-pending .step-title{color:var(--muted)}
+.step-detail{font-size:.8rem;color:var(--muted);margin-top:2px}
+
+/* Especialidades grid */
+.esp-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  gap:12px;
+}
+.esp-card{
+  background:var(--surface);border-radius:var(--radius-sm);
+  padding:16px;display:flex;align-items:center;gap:12px;
+  border:1px solid var(--surface2);
+}
+.dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.dot-green{background:var(--success)}
+.dot-yellow{background:var(--warning)}
+.dot-red{background:var(--danger)}
+.esp-info{flex:1;min-width:0}
+.esp-name{font-weight:600;font-size:.9rem}
+.esp-docs{font-size:.8rem;color:var(--muted)}
+.esp-note{font-size:.75rem;color:var(--warning);margin-top:2px}
+.esp-note.red{color:var(--danger)}
+
+/* Riesgos */
+.risk-list{display:flex;flex-direction:column;gap:12px}
+.risk-card{
+  background:var(--surface);border-radius:var(--radius-sm);
+  padding:16px 20px;display:flex;align-items:center;gap:14px;
+  border:1px solid var(--surface2);
+}
+.risk-badge{
+  font-size:.65rem;font-weight:800;letter-spacing:.06em;
+  padding:3px 10px;border-radius:20px;flex-shrink:0;
+  text-transform:uppercase;
+}
+.risk-alto{background:rgba(239,68,68,.15);color:var(--danger);border:1px solid rgba(239,68,68,.3)}
+.risk-medio{background:rgba(250,204,21,.12);color:var(--warning);border:1px solid rgba(250,204,21,.3)}
+.risk-text{font-size:.9rem;color:var(--text)}
+
+/* Entregables */
+.entregable-list{list-style:none;padding:0}
+.entregable-list li{
+  padding:12px 16px;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;border-bottom:1px solid var(--surface2);flex-wrap:wrap;
+}
+.entregable-list li:last-child{border-bottom:none}
+.entregable-name{font-size:.9rem;font-weight:500}
+.entregable-status{
+  font-size:.75rem;font-weight:600;padding:3px 10px;
+  border-radius:20px;white-space:nowrap;
+}
+.status-prep{background:rgba(150,0,193,.15);color:var(--primary);border:1px solid rgba(150,0,193,.3)}
+.status-pend{background:rgba(136,136,160,.1);color:var(--muted);border:1px solid rgba(136,136,160,.25)}
+.status-next{background:rgba(201,102,79,.12);color:var(--accent);border:1px solid rgba(201,102,79,.3)}
+
+/* Decisiones */
+.decision-list{display:flex;flex-direction:column;gap:10px}
+.decision-card{
+  background:var(--surface);border-left:4px solid var(--accent);
+  border-radius:var(--radius-sm);padding:16px 20px;
+  font-size:.9rem;color:var(--text);
+  border-top:1px solid var(--surface2);border-right:1px solid var(--surface2);border-bottom:1px solid var(--surface2);
+}
+
+/* Historial */
+.historial-list{list-style:none;padding:0}
+.historial-list li{
+  display:flex;gap:14px;align-items:flex-start;
+  padding:10px 0;border-bottom:1px solid var(--surface2);
+}
+.historial-list li:last-child{border-bottom:none}
+.historial-date{
+  font-size:.75rem;color:var(--muted);font-weight:600;
+  min-width:80px;flex-shrink:0;white-space:nowrap;
+}
+.historial-text{font-size:.88rem;color:var(--text)}
+
+/* Footer */
+.footer{
+  text-align:center;padding:32px 20px;margin-top:40px;
+  border-top:1px solid var(--surface2);
+}
+.footer-copy{font-size:.8rem;color:var(--muted);margin-bottom:6px}
+.footer-conf{font-size:.72rem;color:var(--muted);opacity:.7;max-width:600px;margin:0 auto}
+
+/* Responsive */
+@media(max-width:600px){
+  .logo-ihc{height:140px}
+  .project-name{font-size:1.2rem}
+  .estado-value{font-size:1.1rem}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .kpi-value{font-size:1.35rem}
+  .esp-grid{grid-template-columns:1fr}
+  .header-top{justify-content:center;text-align:center}
+  .header-info{text-align:center}
+  .project-row{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="container">
+  <header class="header">
+    <div class="header-top">
+      <img src="https://ingenium-holding.github.io/recepcion-areas-comunes/assets/logo-ihc-blanco.png" alt="Ingenium Holding Corp" class="logo-ihc">
+      <div class="header-info">
+        <span class="badge">Portal del Cliente</span>
+        <div class="project-row">
+          <img src="https://ingenium-holding.github.io/recepcion-areas-comunes/assets/logo-caoba.jpeg" alt="CAOBA" class="logo-caoba">
+          <div>
+            <div class="project-name">CAOBA de Novaterra P.H.</div>
+            <div class="project-sub">Recepci&oacute;n de &Aacute;reas Comunes</div>
+            <div class="project-contract">Contrato ZCIHC-026-CAOBA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+</div>
+
+<main class="container">
+
+  <!-- ESTADO GENERAL -->
+  <div class="section">
+    <div class="card card-accent estado-general">
+      <div class="estado-label">Estado General del Proyecto</div>
+      <div class="estado-value">EN CURSO</div>
+      <div class="estado-fase">Fase de Diagn&oacute;stico Documental</div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:50%"></div>
+      </div>
+      <div class="progress-label">3 de 6 fases completadas</div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="section">
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-value highlight">1,951</div>
+        <div class="kpi-label">Documentos Recibidos</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">56.6%</div>
+        <div class="kpi-label">Verificaci&oacute;n Documental</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value danger">9</div>
+        <div class="kpi-label">Pendientes Cr&iacute;ticos</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-value">10</div>
+        <div class="kpi-label">Especialidades Revisadas</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AVANCE POR FASES -->
+  <div class="section">
+    <h2 class="section-title">Avance por Fases</h2>
+    <div class="card">
+      <ul class="stepper">
+        <li class="step-done">
+          <span class="step-icon">&check;</span>
+          <div>
+            <div class="step-title">Recolecci&oacute;n Documental</div>
+            <div class="step-detail">Completada</div>
+          </div>
+        </li>
+        <li class="step-done">
+          <span class="step-icon">&check;</span>
+          <div>
+            <div class="step-title">Organizaci&oacute;n y Clasificaci&oacute;n</div>
+            <div class="step-detail">1,951 documentos &mdash; Completada</div>
+          </div>
+        </li>
+        <li class="step-done">
+          <span class="step-icon">&check;</span>
+          <div>
+            <div class="step-title">Diagn&oacute;stico de Completitud</div>
+            <div class="step-detail">Completada</div>
+          </div>
+        </li>
+        <li class="step-next">
+          <span class="step-icon">4</span>
+          <div>
+            <div class="step-title">Inspecciones de Campo</div>
+            <div class="step-detail">Pr&oacute;xima</div>
+          </div>
+        </li>
+        <li class="step-pending">
+          <span class="step-icon">5</span>
+          <div>
+            <div class="step-title">Informes T&eacute;cnico-Jur&iacute;dicos</div>
+            <div class="step-detail">Pendiente</div>
+          </div>
+        </li>
+        <li class="step-pending">
+          <span class="step-icon">6</span>
+          <div>
+            <div class="step-title">Acompa&ntilde;amiento y Correcciones</div>
+            <div class="step-detail">Pendiente</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ESPECIALIDADES REVISADAS -->
+  <div class="section">
+    <h2 class="section-title">Especialidades Revisadas</h2>
+    <div class="esp-grid">
+      <div class="esp-card">
+        <span class="dot dot-green"></span>
+        <div class="esp-info">
+          <div class="esp-name">Estructural</div>
+          <div class="esp-docs">439 documentos</div>
+        </div>
+      </div>
+      <div class="esp-card">
+        <span class="dot dot-yellow"></span>
+        <div class="esp-info">
+          <div class="esp-name">El&eacute;ctrico</div>
+          <div class="esp-docs">802 documentos</div>
+          <div class="esp-note">RETIE / RITEL pendientes</div>
+        </div>
+      </div>
+      <div class="esp-card">
+        <span class="dot dot-yellow"></span>
+        <div class="esp-info">
+          <div class="esp-name">Hidr&aacute;ulico</div>
+          <div class="esp-docs">107 documentos</div>
+          <div class="esp-note">Memorias pendientes</div>
+        </div>
+      </div>
+      <div class="esp-card">
+        <span class="dot dot-green"></span>
+        <div class="esp-info">
+          <div class="esp-name">Gas</div>
+          <div class="esp-docs">79 documentos</div>
+        </div>
+      </div>
+      <div class="esp-card">
+        <span class="dot dot-yellow"></span>
+        <div class="esp-info">
+          <div class="esp-name">Contra Incendio</div>
+          <div class="esp-docs">67 documentos</div>
+          <div class="esp-note">Dossier incompleto</div>
+        </div>
+      </div>
+      <div class="esp-card">
+        <span class="dot dot-green"></span>
+        <div class="esp-info">
+          <div class="esp-name">Arquitect&oacute;nico</div>
+          <div class="esp-docs">52 documentos</div>
+        </div>
+      </div>
+      <div class="esp-card">
+        <span class="dot dot-green"></span>
+        <div class="esp-info">
+          <div class="esp-name">Mec&aacute;nico / Ascensores</div>
+          <div class="esp-docs">119 documentos</div>
+        </div>
+      </div>
+      <div class="esp-card">
+        <span class="dot dot-green"></span>
+        <div class="esp-info">
+          <div class="esp-name">Dotaciones</div>
+          <div class="esp-docs">261 documentos</div>
+        </div>
+      </div>
+      <div class="esp-card">
+        <span class="dot dot-yellow"></span>
+        <div class="esp-info">
+          <div class="esp-name">Seguridad</div>
+          <div class="esp-docs">14 documentos</div>
+          <div class="esp-note">Citofon&iacute;a pendiente</div>
+        </div>
+      </div>
+      <div class="esp-card">
+        <span class="dot dot-red"></span>
+        <div class="esp-info">
+          <div class="esp-name">Jur&iacute;dico / Licencias</div>
+          <div class="esp-docs">9 documentos</div>
+          <div class="esp-note red">Licencia de urbanismo faltante</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIESGOS PRINCIPALES -->
+  <div class="section">
+    <h2 class="section-title">Riesgos Principales</h2>
+    <div class="risk-list">
+      <div class="risk-card">
+        <span class="risk-badge risk-alto">Alto</span>
+        <span class="risk-text">Certificaciones el&eacute;ctricas RITEL pendientes en las 18 torres</span>
+      </div>
+      <div class="risk-card">
+        <span class="risk-badge risk-alto">Alto</span>
+        <span class="risk-text">Certificaciones RETIE faltantes en 4 torres</span>
+      </div>
+      <div class="risk-card">
+        <span class="risk-badge risk-alto">Alto</span>
+        <span class="risk-text">Documentaci&oacute;n de seguridad humana no encontrada</span>
+      </div>
+      <div class="risk-card">
+        <span class="risk-badge risk-medio">Medio</span>
+        <span class="risk-text">Memorias de c&aacute;lculo hidr&aacute;ulico pendientes</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRÓXIMOS ENTREGABLES -->
+  <div class="section">
+    <h2 class="section-title">Pr&oacute;ximos Entregables de Ingenium</h2>
+    <div class="card">
+      <ul class="entregable-list">
+        <li>
+          <span class="entregable-name">Informe de Diagn&oacute;stico Documental V1</span>
+          <span class="entregable-status status-prep">En preparaci&oacute;n</span>
+        </li>
+        <li>
+          <span class="entregable-name">Derecho de Petici&oacute;n a constructora</span>
+          <span class="entregable-status status-pend">Pendiente</span>
+        </li>
+        <li>
+          <span class="entregable-name">Programaci&oacute;n de inspecciones de campo</span>
+          <span class="entregable-status status-pend">Pendiente</span>
+        </li>
+        <li>
+          <span class="entregable-name">Informe T&eacute;cnico-Jur&iacute;dico V1</span>
+          <span class="entregable-status status-next">Pr&oacute;xima fase</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- DECISIONES DE LA COPROPIEDAD -->
+  <div class="section">
+    <h2 class="section-title">Decisiones que Necesita Tomar la Copropiedad</h2>
+    <div class="decision-list">
+      <div class="decision-card">Autorizar env&iacute;o de Derecho de Petici&oacute;n a la constructora solicitando documentaci&oacute;n faltante.</div>
+      <div class="decision-card">Coordinar accesos para inspecciones de campo en &aacute;reas comunes.</div>
+      <div class="decision-card">Definir si se incluyen amenidades adicionales en el alcance (Zona Lavander&iacute;a, Caf&eacute;/Coworking, Cancha Volley, Zona Pet).</div>
+      <div class="decision-card">Revisar y aprobar Informe Documental V1 cuando est&eacute; listo.</div>
+    </div>
+  </div>
+
+  <!-- HISTORIAL RESUMIDO -->
+  <div class="section">
+    <h2 class="section-title">Historial Resumido</h2>
+    <div class="card">
+      <ul class="historial-list">
+        <li>
+          <span class="historial-date">Abr 2026</span>
+          <span class="historial-text">Inicio de recolecci&oacute;n documental</span>
+        </li>
+        <li>
+          <span class="historial-date">Abr 2026</span>
+          <span class="historial-text">Clasificaci&oacute;n de 1,951 documentos completada</span>
+        </li>
+        <li>
+          <span class="historial-date">Abr 2026</span>
+          <span class="historial-text">Diagn&oacute;stico de completitud &mdash; 56.6% completo, 9 faltantes cr&iacute;ticos identificados</span>
+        </li>
+        <li>
+          <span class="historial-date">Pr&oacute;ximo</span>
+          <span class="historial-text">Inspecciones t&eacute;cnicas de campo</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-copy">Ingenium Holding Corp S.A.S &copy; <span id="year"></span></div>
+  <div class="footer-conf">Este portal es confidencial y exclusivo para el Consejo de Administraci&oacute;n de CAOBA de Novaterra P.H.</div>
+</footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
