@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico Actas de Entrega — CAOBA de Novaterra P.H.</title>
+<style>
+  :root {
+    --green: #22c55e; --yellow: #eab308; --red: #ef4444; --blue: #2563eb;
+    --bg: #eef1f5; --card: #f8fafc; --text: #1e293b; --muted: #64748b;
+    --border: #e2e8f0; --accent: #2563eb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+  .container { max-width: 960px; margin: 0 auto; padding: 1rem; }
+  header { background: var(--accent); color: #fff; padding: 1.5rem 1rem; margin-bottom: 1.5rem; border-radius: 0 0 1rem 1rem; }
+  header h1 { font-size: 1.25rem; font-weight: 700; }
+  header p { font-size: 0.85rem; opacity: 0.85; margin-top: 0.25rem; }
+
+  /* Portal header */
+  .portal-header { background: #0D0D12; padding: 2rem 1rem; }
+  .portal-header .container { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+  .portal-header .logo-ihc { height: 140px; width: auto; }
+  .portal-header .logo-caoba { height: 70px; width: 70px; border-radius: 10px; object-fit: cover; }
+  .portal-header .info { flex: 1; min-width: 200px; }
+  .portal-header .badge-portal { display: inline-block; background: #420049; color: #9600C1; font-size: .72rem; font-weight: 700; letter-spacing: .06em; padding: 4px 12px; border-radius: 20px; border: 1px solid #9600C1; text-transform: uppercase; margin-bottom: 6px; }
+  .portal-header .title { font-size: 1.35rem; font-weight: 700; color: #E8E8F0; }
+  .portal-header .sub { font-size: .88rem; color: #8888A0; margin-top: 4px; }
+  .back-link { display: inline-block; font-size: .82rem; color: var(--accent); text-decoration: none; padding: 0.5rem 1rem; }
+  .back-link:hover { text-decoration: underline; }
+  @media(max-width:600px){
+    .portal-header .logo-ihc { height: 80px; }
+    .portal-header .logo-caoba { height: 50px; width: 50px; }
+    .portal-header .title { font-size: 1.1rem; }
+    .portal-header .container { justify-content: center; text-align: center; }
+  }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+  .kpi { background: var(--card); border-radius: 0.75rem; padding: 1rem; text-align: center; border: 1px solid var(--border); }
+  .kpi .number { font-size: 2rem; font-weight: 800; }
+  .kpi .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .kpi.green .number { color: var(--green); }
+  .kpi.yellow .number { color: var(--yellow); }
+  .kpi.red .number { color: var(--red); }
+  .kpi.blue .number { color: var(--blue); }
+
+  .section { background: var(--card); border-radius: 0.75rem; border: 1px solid var(--border); margin-bottom: 1rem; overflow: hidden; }
+  .section-header { padding: 0.75rem 1rem; font-weight: 700; font-size: 0.95rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+  .section-header .badge { font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 1rem; font-weight: 600; }
+  .badge-red { background: #fee2e2; color: #dc2626; }
+  .badge-yellow { background: #fef9c3; color: #a16207; }
+  .badge-green { background: #dcfce7; color: #16a34a; }
+  .badge-blue { background: #dbeafe; color: #1d4ed8; }
+  .section-body { padding: 0; }
+  .section-body.collapsed { display: none; }
+
+  .progress-wrap { padding: 0.75rem 1rem; }
+  .progress-bar { height: 0.5rem; background: #e2e8f0; border-radius: 1rem; overflow: hidden; display: flex; }
+  .progress-bar .seg { height: 100%; }
+  .seg-green { background: var(--green); }
+  .seg-yellow { background: var(--yellow); }
+  .seg-red { background: var(--red); }
+  .seg-blue { background: var(--blue); }
+  .progress-legend { display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 0.75rem; color: var(--muted); flex-wrap: wrap; }
+  .progress-legend span::before { content: ''; display: inline-block; width: 0.6rem; height: 0.6rem; border-radius: 50%; margin-right: 0.3rem; vertical-align: middle; }
+  .leg-green::before { background: var(--green); }
+  .leg-yellow::before { background: var(--yellow); }
+  .leg-red::before { background: var(--red); }
+  .leg-blue::before { background: var(--blue); }
+
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { text-align: left; padding: 0.5rem 0.75rem; background: #e8ecf1; color: var(--muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; position: sticky; top: 0; }
+  td { padding: 0.5rem 0.75rem; border-top: 1px solid var(--border); }
+  tr:hover td { background: #f8fafc; }
+
+  .dot { width: 0.6rem; height: 0.6rem; border-radius: 50%; display: inline-block; }
+  .dot-ok { background: var(--green); }
+  .dot-miss { background: var(--red); }
+  .dot-partial { background: var(--yellow); }
+  .dot-na { background: #cbd5e1; }
+
+  .status-tag { font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 0.25rem; font-weight: 600; white-space: nowrap; }
+  .tag-completo { background: #dcfce7; color: #16a34a; }
+  .tag-incompleto { background: #fef9c3; color: #a16207; }
+  .tag-sin-acta { background: #fee2e2; color: #dc2626; }
+  .tag-parcial { background: #dbeafe; color: #1d4ed8; }
+  .tag-na { background: #e8ecf1; color: #64748b; }
+  .tag-indirecto { background: #f3e8ff; color: #7c3aed; }
+
+  .divider { padding: 0.5rem 0.75rem; background: #e8ecf1; font-weight: 700; font-size: 0.8rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; border-top: 2px solid var(--accent); }
+
+  .note { padding: 0.75rem 1rem; font-size: 0.8rem; border-top: 1px solid var(--border); }
+  .note-red { background: #fef2f2; color: #dc2626; }
+  .note-yellow { background: #fffbeb; color: #a16207; }
+  .note-blue { background: #eff6ff; color: #1d4ed8; }
+
+  footer { text-align: center; padding: 2rem 1rem; font-size: 0.75rem; color: var(--muted); border-top: 1px solid var(--border); margin-top: 1.5rem; }
+  .chevron { transition: transform 0.2s; font-size: 0.8rem; }
+  .chevron.open { transform: rotate(180deg); }
+
+  /* Glossary */
+  .glossary { background: var(--card); border-radius: 0.75rem; border: 1px solid var(--border); margin: 1.5rem 0 0.5rem; overflow: hidden; }
+  .glossary-header { padding: 0.75rem 1rem; font-weight: 700; font-size: 0.95rem; border-bottom: 1px solid var(--border); background: #f8fafc; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+  .glossary-body { padding: 1rem; }
+  .glossary-body.collapsed { display: none; }
+  .glossary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
+  .glossary-group h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); margin-bottom: 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; }
+  .glossary-item { display: flex; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.4rem; font-size: 0.82rem; }
+  .glossary-item strong { min-width: 70px; flex-shrink: 0; }
+  .glossary-item .dot-sample { flex-shrink: 0; margin-top: 0.35rem; }
+
+  .subtitle { font-size: 0.8rem; color: var(--muted); font-weight: 400; margin-left: 0.5rem; }
+
+  /* Tab nav */
+  .tab-nav { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 1rem; }
+  .tab-btn { padding: 0.75rem 1.25rem; font-size: 0.85rem; font-weight: 600; border: none; background: none; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -2px; }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- Portal header (dark strip with logos) -->
+<div class="portal-header">
+  <div class="container">
+    <img src="https://ingenium-holding.github.io/recepcion-areas-comunes/assets/logo-ihc-blanco.png" alt="Ingenium Holding Corp" class="logo-ihc">
+    <div class="info">
+      <div class="badge-portal">Diagn&oacute;stico Actas de Entrega</div>
+      <div class="title">CAOBA de Novaterra P.H.</div>
+      <div class="sub">Cruce: Actas de Entrega vs. Bienes del Proyecto &bull; Abril 2026</div>
+    </div>
+    <img src="https://ingenium-holding.github.io/recepcion-areas-comunes/assets/logo-caoba.jpeg" alt="CAOBA" class="logo-caoba">
+  </div>
+</div>
+<a href="index.html" class="back-link">&larr; Volver al Portal</a>
+
+<div class="container">
+
+  <!-- Main tab navigation -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="showTab('general')">Resumen General</button>
+    <button class="tab-btn" onclick="showTab('cruce')">Cruce Bienes vs Actas</button>
+    <button class="tab-btn" onclick="showTab('torres')">Torres</button>
+  </div>
+
+  <!-- ==================== TAB 1: RESUMEN GENERAL ==================== -->
+  <div class="tab-panel active" id="tab-general">
+
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="number">485</div>
+        <div class="label">Documentos totales</div>
+      </div>
+      <div class="kpi">
+        <div class="number">33</div>
+        <div class="label">Bienes del proyecto</div>
+      </div>
+      <div class="kpi green">
+        <div class="number">12</div>
+        <div class="label">Con acta completa</div>
+      </div>
+      <div class="kpi yellow">
+        <div class="number">6</div>
+        <div class="label">Con acta incompleta</div>
+      </div>
+      <div class="kpi red">
+        <div class="number">9</div>
+        <div class="label">Sin acta</div>
+      </div>
+    </div>
+
+    <!-- Estructura documental -->
+    <div class="section">
+      <div class="section-header" onclick="toggle('estructura')">
+        Estructura del juego documental
+        <span class="chevron open" id="chev-estructura">&#9660;</span>
+      </div>
+      <div class="section-body" id="estructura">
+        <div class="progress-wrap">
+          <p style="font-size:0.85rem; margin-bottom:0.75rem;">Cada bien o ubicación debería tener un <strong>documento principal</strong> (ACT_ENT) acompañado de sus <strong>complementarios</strong>:</p>
+          <table style="margin-bottom:0.5rem;">
+            <tr><td><strong>ACT_ENT</strong></td><td>Acta de Entrega</td><td style="text-align:right"><strong>178</strong></td><td style="color:var(--accent);font-weight:600;text-align:right">Principal</td></tr>
+            <tr><td><strong>ACT_OBS</strong></td><td>Observaciones / Defectos</td><td style="text-align:right"><strong>187</strong></td><td style="color:var(--muted);text-align:right">Complementario</td></tr>
+            <tr><td><strong>ACT_FOT</strong></td><td>Registro Fotográfico</td><td style="text-align:right"><strong>119</strong></td><td style="color:var(--muted);text-align:right">Complementario</td></tr>
+            <tr><td><strong>ACT_CAP</strong></td><td>Capacitación</td><td style="text-align:right"><strong>1</strong></td><td style="color:var(--muted);text-align:right">Complementario</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cobertura documental -->
+    <div class="section">
+      <div class="section-header" onclick="toggle('cobertura')">
+        Cobertura documental — Bienes del Proyecto
+        <span class="chevron open" id="chev-cobertura">&#9660;</span>
+      </div>
+      <div class="section-body" id="cobertura">
+        <div class="progress-wrap">
+          <p style="font-size:0.85rem; margin-bottom:0.5rem;"><strong>Bienes Esenciales</strong> (20 categorías de sistemas e infraestructura)</p>
+          <div class="progress-bar" style="margin-bottom:0.25rem;">
+            <div class="seg seg-green" style="width:15%"></div>
+            <div class="seg seg-yellow" style="width:30%"></div>
+            <div class="seg seg-red" style="width:25%"></div>
+            <div class="seg" style="width:30%; background:#cbd5e1;"></div>
+          </div>
+          <div class="progress-legend">
+            <span class="leg-green">Completo: 3</span>
+            <span class="leg-yellow">Incompleto/Parcial: 6</span>
+            <span class="leg-red">Sin acta: 5</span>
+            <span style="color:var(--muted)"><span style="display:inline-block;width:0.6rem;height:0.6rem;border-radius:50%;background:#cbd5e1;margin-right:0.3rem;vertical-align:middle;"></span>Indirecto/N.A.: 6</span>
+          </div>
+        </div>
+        <div class="progress-wrap" style="border-top:1px solid var(--border);">
+          <p style="font-size:0.85rem; margin-bottom:0.5rem;"><strong>Bienes No Esenciales</strong> (13 amenidades y zonas recreativas)</p>
+          <div class="progress-bar" style="margin-bottom:0.25rem;">
+            <div class="seg seg-green" style="width:53.8%"></div>
+            <div class="seg seg-yellow" style="width:15.4%"></div>
+            <div class="seg seg-red" style="width:30.8%"></div>
+          </div>
+          <div class="progress-legend">
+            <span class="leg-green">Completo: 7</span>
+            <span class="leg-yellow">Incompleto: 2</span>
+            <span class="leg-red">Sin acta: 4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Torres -->
+    <div class="section">
+      <div class="section-header" onclick="toggle('torres-resumen')">
+        Cobertura documental — Torres
+        <span class="chevron open" id="chev-torres-resumen">&#9660;</span>
+      </div>
+      <div class="section-body" id="torres-resumen">
+        <div class="progress-wrap">
+          <p style="font-size:0.85rem; margin-bottom:0.5rem;">De las <strong>18 torres</strong> del proyecto:</p>
+          <div class="progress-bar" style="margin-bottom:0.25rem;">
+            <div class="seg seg-green" style="width:66.7%"></div>
+            <div class="seg seg-red" style="width:33.3%"></div>
+          </div>
+          <div class="progress-legend">
+            <span class="leg-green">Con actas: 12 torres</span>
+            <span class="leg-red">Sin actas: 6 torres (T1, T13, T14, T16, T17, T18)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== TAB 2: CRUCE BIENES VS ACTAS ==================== -->
+  <div class="tab-panel" id="tab-cruce">
+
+    <!-- BIENES ESENCIALES -->
+    <div class="section">
+      <div class="section-header" onclick="toggle('esenciales')">
+        Bienes Esenciales — Sistemas e Infraestructura
+        <span><span class="badge badge-blue">20 categorías</span> <span class="chevron open" id="chev-esenciales">&#9660;</span></span>
+      </div>
+      <div class="section-body" id="esenciales">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th style="width:40%">Bien Esencial</th><th>Acta vinculada</th><th>ENT</th><th>FOT</th><th>OBS</th><th>Estado</th></tr></thead>
+            <tbody>
+              <!-- Con acta directa -->
+              <tr class="divider-row"><td colspan="6" class="divider">Con acta de entrega directa</td></tr>
+              <tr>
+                <td>Sistemas de Transporte (Ascensores)</td>
+                <td>Ascensor (5 de 12 torres)</td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-partial"></span></td>
+                <td><span class="dot dot-partial"></span></td>
+                <td><span class="status-tag tag-incompleto">Incompleto</span></td>
+              </tr>
+              <tr>
+                <td>Red Contra Incendio</td>
+                <td>Red-Incendios</td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="status-tag tag-incompleto">Incompleto</span></td>
+              </tr>
+              <tr>
+                <td>Red Hidráulica / Sanitaria</td>
+                <td>Motobombas + Tanques Agua</td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-partial"></span></td>
+                <td><span class="status-tag tag-incompleto">Incompleto</span></td>
+              </tr>
+              <tr>
+                <td>Red Eléctrica e Instalaciones</td>
+                <td>Cuarto SETI (3 de 12 torres)</td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="status-tag tag-incompleto">Incompleto</span></td>
+              </tr>
+              <tr>
+                <td>Impermeabilizaciones, Fachadas y Cubiertas</td>
+                <td>Fachada (6 torres) + Cubierta (7 torres)</td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-partial"></span></td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="status-tag tag-incompleto">Incompleto</span></td>
+              </tr>
+              <tr>
+                <td>Dotación (Zonas Sociales y Recreativas)</td>
+                <td>Salones + Gimnasio + Crossfit</td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="status-tag tag-completo">Completo</span></td>
+              </tr>
+
+              <!-- Cubiertos indirectamente -->
+              <tr class="divider-row"><td colspan="6" class="divider">Cubiertos indirectamente por actas de áreas comunes (pasillos, escaleras)</td></tr>
+              <tr>
+                <td>Aparatos e Incrustaciones Zonas Comunes</td>
+                <td>Actas de pasillos/escaleras por torre</td>
+                <td colspan="3" style="text-align:center; color:var(--muted); font-size:0.8rem;">Incluidos en inspección de áreas</td>
+                <td><span class="status-tag tag-indirecto">Indirecto</span></td>
+              </tr>
+              <tr>
+                <td>Carpintería en Acero Inoxidable y Vidrio</td>
+                <td>Actas de pasillos/escaleras por torre</td>
+                <td colspan="3" style="text-align:center; color:var(--muted); font-size:0.8rem;">Incluidos en inspección de áreas</td>
+                <td><span class="status-tag tag-indirecto">Indirecto</span></td>
+              </tr>
+              <tr>
+                <td>Carpintería en Aluminio — Puertas y Ventanería</td>
+                <td>Actas de pasillos/escaleras por torre</td>
+                <td colspan="3" style="text-align:center; color:var(--muted); font-size:0.8rem;">Incluidos en inspección de áreas</td>
+                <td><span class="status-tag tag-indirecto">Indirecto</span></td>
+              </tr>
+              <tr>
+                <td>Carpintería en Madera y Mesones</td>
+                <td>Actas de pasillos/edificios</td>
+                <td colspan="3" style="text-align:center; color:var(--muted); font-size:0.8rem;">Incluidos en inspección de áreas</td>
+                <td><span class="status-tag tag-indirecto">Indirecto</span></td>
+              </tr>
+              <tr>
+                <td>Carpintería Metálica</td>
+                <td>Actas de pasillos/escaleras por torre</td>
+                <td colspan="3" style="text-align:center; color:var(--muted); font-size:0.8rem;">Incluidos en inspección de áreas</td>
+                <td><span class="status-tag tag-indirecto">Indirecto</span></td>
+              </tr>
+              <tr>
+                <td>Carpintería Metálica — Puertas Cortafuego</td>
+                <td>Actas de escaleras por torre</td>
+                <td colspan="3" style="text-align:center; color:var(--muted); font-size:0.8rem;">Incluidos en inspección de áreas</td>
+                <td><span class="status-tag tag-indirecto">Indirecto</span></td>
+              </tr>
+              <tr>
+                <td>Pisos y Enchapes en Zonas Comunes</td>
+                <td>Actas de pasillos por torre</td>
+                <td colspan="3" style="text-align:center; color:var(--muted); font-size:0.8rem;">Incluidos en inspección de áreas</td>
+                <td><span class="status-tag tag-indirecto">Indirecto</span></td>
+              </tr>
+              <tr>
+                <td>Cubiertas Metálicas / Placas / Tejas</td>
+                <td>Actas de cubierta por torre</td>
+                <td colspan="3" style="text-align:center; color:var(--muted); font-size:0.8rem;">Incluidos en inspección de áreas</td>
+                <td><span class="status-tag tag-indirecto">Indirecto</span></td>
+              </tr>
+
+              <!-- Sin acta -->
+              <tr class="divider-row"><td colspan="6" class="divider">Sin acta de entrega</td></tr>
+              <tr>
+                <td>Red Gas e Instalaciones</td>
+                <td>—</td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="status-tag tag-sin-acta">Sin acta</span></td>
+              </tr>
+              <tr>
+                <td>Seguridad y Control — Señalización — Talanqueras</td>
+                <td>—</td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="status-tag tag-sin-acta">Sin acta</span></td>
+              </tr>
+              <tr>
+                <td>Controles de Asentamientos</td>
+                <td>—</td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="status-tag tag-sin-acta">Sin acta</span></td>
+              </tr>
+              <tr>
+                <td>Ganchos / Anclajes</td>
+                <td>—</td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="status-tag tag-sin-acta">Sin acta</span></td>
+              </tr>
+
+              <!-- N/A -->
+              <tr class="divider-row"><td colspan="6" class="divider">No aplica (documentación, no activos físicos)</td></tr>
+              <tr>
+                <td>Documentos Legales</td>
+                <td>—</td>
+                <td colspan="3"></td>
+                <td><span class="status-tag tag-na">N/A</span></td>
+              </tr>
+              <tr>
+                <td>Hoja de Vida Equipos</td>
+                <td>—</td>
+                <td colspan="3"></td>
+                <td><span class="status-tag tag-na">N/A</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note note-yellow">
+          Los bienes cubiertos "indirectamente" son sistemas constructivos inspeccionados dentro de las actas de entrega por área (pasillos, escaleras, fachadas). No tienen acta dedicada por sistema.
+        </div>
+      </div>
+    </div>
+
+    <!-- BIENES NO ESENCIALES -->
+    <div class="section">
+      <div class="section-header" onclick="toggle('no-esenciales')">
+        Bienes No Esenciales — Amenidades y Zonas Recreativas
+        <span><span class="badge badge-blue">13 categorías</span> <span class="chevron open" id="chev-no-esenciales">&#9660;</span></span>
+      </div>
+      <div class="section-body" id="no-esenciales">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th style="width:30%">Bien No Esencial</th><th>Acta vinculada</th><th>ENT</th><th>FOT</th><th>OBS</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr class="divider-row"><td colspan="6" class="divider">Con acta de entrega</td></tr>
+              <tr>
+                <td>Salones Sociales</td>
+                <td>Salón Social 1, Salón Social 2</td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="status-tag tag-completo">Completo</span></td>
+              </tr>
+              <tr>
+                <td>Gimnasio</td>
+                <td>Gimnasio Aire Libre + Salón Clases + Crossfit</td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="status-tag tag-completo">Completo</span></td>
+              </tr>
+              <tr>
+                <td>Zona Camping — BBQ</td>
+                <td>BBQ 1, BBQ 2</td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="status-tag tag-completo">Completo</span></td>
+              </tr>
+              <tr>
+                <td>Juegos Infantiles</td>
+                <td>Parque Infantil — Playground</td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="status-tag tag-incompleto">Incompleto</span></td>
+              </tr>
+              <tr>
+                <td>Salón de Recreación Infantil</td>
+                <td>Salón Social Kids</td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="status-tag tag-incompleto">Incompleto</span></td>
+              </tr>
+
+              <tr class="divider-row"><td colspan="6" class="divider">Sin acta de entrega</td></tr>
+              <tr>
+                <td>Bicicleteros</td>
+                <td>—</td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="status-tag tag-sin-acta">Sin acta</span></td>
+              </tr>
+              <tr>
+                <td>Biosaludables</td>
+                <td>—</td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="status-tag tag-sin-acta">Sin acta</span></td>
+              </tr>
+              <tr>
+                <td>Cancha Múltiple</td>
+                <td>—</td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="status-tag tag-sin-acta">Sin acta</span></td>
+              </tr>
+              <tr>
+                <td>Cancha Volley</td>
+                <td>—</td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="status-tag tag-sin-acta">Sin acta</span></td>
+              </tr>
+              <tr>
+                <td>Salón de Juegos</td>
+                <td>—</td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="status-tag tag-sin-acta">Sin acta</span></td>
+              </tr>
+              <tr>
+                <td>Sendero de Trote</td>
+                <td>—</td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="status-tag tag-sin-acta">Sin acta</span></td>
+              </tr>
+              <tr>
+                <td>Zona de Recreación Canina</td>
+                <td>—</td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="status-tag tag-sin-acta">Sin acta</span></td>
+              </tr>
+              <tr>
+                <td>Zona Húmeda — Piscinas</td>
+                <td>—</td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="dot dot-miss"></span></td>
+                <td><span class="status-tag tag-sin-acta">Sin acta</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note note-red">
+          8 de 13 amenidades no tienen acta de entrega. Estas deben solicitarse formalmente al constructor.
+        </div>
+      </div>
+    </div>
+
+    <!-- Actas sin bien asociado -->
+    <div class="section">
+      <div class="section-header" onclick="toggle('extras')">
+        Actas de entrega sin categoría de bien asociada
+        <span><span class="badge badge-yellow">2 actas</span> <span class="chevron" id="chev-extras">&#9660;</span></span>
+      </div>
+      <div class="section-body collapsed" id="extras">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Acta</th><th>ENT</th><th>FOT</th><th>OBS</th><th>Observación</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Café Coworking</td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-ok"></span></td>
+                <td style="font-size:0.8rem; color:var(--muted)">No aparece en listado de bienes esenciales ni no esenciales</td>
+              </tr>
+              <tr>
+                <td>Portería Piso 2 — Zona Lounge</td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-ok"></span></td>
+                <td><span class="dot dot-ok"></span></td>
+                <td style="font-size:0.8rem; color:var(--muted)">No aparece en listado de bienes esenciales ni no esenciales</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note note-blue">
+          Estas ubicaciones tienen juego documental completo pero no corresponden a ninguna categoría del listado de bienes. Considerar si deben incluirse como bienes adicionales.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== TAB 3: TORRES ==================== -->
+  <div class="tab-panel" id="tab-torres">
+
+    <div class="section">
+      <div class="section-header" onclick="toggle('torre-detail')">
+        Cobertura por torre — Áreas con ACT_ENT
+        <span class="chevron open" id="chev-torre-detail">&#9660;</span>
+      </div>
+      <div class="section-body" id="torre-detail">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Torre</th><th>Ascensor</th><th>Cubierta</th><th>SETI</th><th>Fachada</th><th>Escaleras</th><th>Pasillos</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td><strong>T1</strong></td><td colspan="6" style="text-align:center; color:var(--red)">Sin documentación</td><td><span class="status-tag tag-sin-acta">Sin acta</span></td></tr>
+              <tr><td><strong>T2</strong></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-ok"></span></td><td>12</td><td><span class="status-tag tag-incompleto">Incompleto</span></td></tr>
+              <tr><td><strong>T3</strong></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td>13</td><td><span class="status-tag tag-incompleto">Incompleto</span></td></tr>
+              <tr><td><strong>T4</strong></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td>9</td><td><span class="status-tag tag-incompleto">Incompleto</span></td></tr>
+              <tr><td><strong>T5</strong></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td>12</td><td><span class="status-tag tag-incompleto">Incompleto</span></td></tr>
+              <tr><td><strong>T6</strong></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-ok"></span></td><td>12</td><td><span class="status-tag tag-incompleto">Incompleto</span></td></tr>
+              <tr><td><strong>T7</strong></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td>11</td><td><span class="status-tag tag-incompleto">Incompleto</span></td></tr>
+              <tr><td><strong>T8</strong></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-miss"></span></td><td>12</td><td><span class="status-tag tag-incompleto">Incompleto</span></td></tr>
+              <tr><td><strong>T9</strong></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td>12</td><td><span class="status-tag tag-incompleto">Incompleto</span></td></tr>
+              <tr><td><strong>T10</strong></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td>11</td><td><span class="status-tag tag-completo">Más completa</span></td></tr>
+              <tr><td><strong>T11</strong></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-miss"></span></td><td>12</td><td><span class="status-tag tag-incompleto">Incompleto</span></td></tr>
+              <tr><td><strong>T12</strong></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-ok"></span></td><td>4</td><td><span class="status-tag tag-incompleto">Incompleto</span></td></tr>
+              <tr><td><strong>T13</strong></td><td colspan="6" style="text-align:center; color:var(--red)">Sin documentación</td><td><span class="status-tag tag-sin-acta">Sin acta</span></td></tr>
+              <tr><td><strong>T14</strong></td><td colspan="6" style="text-align:center; color:var(--red)">Sin documentación</td><td><span class="status-tag tag-sin-acta">Sin acta</span></td></tr>
+              <tr><td><strong>T15</strong></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-miss"></span></td><td>1</td><td><span class="status-tag tag-incompleto">Mínima</span></td></tr>
+              <tr><td><strong>T16</strong></td><td colspan="6" style="text-align:center; color:var(--red)">Sin documentación</td><td><span class="status-tag tag-sin-acta">Sin acta</span></td></tr>
+              <tr><td><strong>T17</strong></td><td colspan="6" style="text-align:center; color:var(--red)">Sin documentación</td><td><span class="status-tag tag-sin-acta">Sin acta</span></td></tr>
+              <tr><td><strong>T18</strong></td><td colspan="6" style="text-align:center; color:var(--red)">Sin documentación</td><td><span class="status-tag tag-sin-acta">Sin acta</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note note-blue">
+          <strong>Torre 10</strong> es la más completa (Ascensor + Cubierta + SETI + Fachada + Escaleras + 11 pasillos). Puede usarse como referencia para solicitar la documentación faltante de las demás torres.
+        </div>
+      </div>
+    </div>
+
+    <!-- 7 ubicaciones sin ACT_ENT -->
+    <div class="section">
+      <div class="section-header" onclick="toggle('sin-ent')">
+        Ubicaciones con complementarios pero sin acta principal
+        <span><span class="badge badge-red">7 anomalías</span> <span class="chevron" id="chev-sin-ent">&#9660;</span></span>
+      </div>
+      <div class="section-body collapsed" id="sin-ent">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Ubicación</th><th>FOT</th><th>OBS</th><th>CAP</th></tr></thead>
+            <tbody>
+              <tr><td>T02 — Fachada</td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-miss"></span></td></tr>
+              <tr><td>T03 — Pasillo Piso 11</td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-miss"></span></td></tr>
+              <tr><td>T04 — Pasillo Piso 06</td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-miss"></span></td></tr>
+              <tr><td>T06 — General</td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-miss"></span></td></tr>
+              <tr><td>T07 — Pasillo Piso 02</td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-miss"></span></td></tr>
+              <tr><td>T09 — General</td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-miss"></span></td></tr>
+              <tr><td>Planta Eléctrica</td><td><span class="dot dot-miss"></span></td><td><span class="dot dot-ok"></span></td><td><span class="dot dot-miss"></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note note-red">
+          Estas ubicaciones tienen documentos complementarios pero NO tienen el acta principal de entrega (ACT_ENT). Se deben solicitar al constructor/administración.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+  <!-- NOMENCLATURA / GLOSARIO — visible en todas las pestañas -->
+  <div class="glossary">
+    <div class="glossary-header" onclick="toggle('glosario')">
+      Nomenclatura y convenciones usadas en este informe
+      <span class="chevron open" id="chev-glosario">&#9660;</span>
+    </div>
+    <div class="glossary-body" id="glosario">
+      <div class="glossary-grid">
+
+        <!-- Tipos de documento -->
+        <div class="glossary-group">
+          <h4>Tipos de documento</h4>
+          <div class="glossary-item"><strong>ENT</strong> Acta de Entrega — documento principal que formaliza la entrega del constructor a la copropiedad</div>
+          <div class="glossary-item"><strong>OBS</strong> Observaciones — documento donde se registran defectos, daños o pendientes encontrados durante la entrega</div>
+          <div class="glossary-item"><strong>FOT</strong> Registro Fotográfico — evidencia en fotos del estado del bien al momento de la entrega</div>
+          <div class="glossary-item"><strong>CAP</strong> Capacitación — acta que certifica que se brindó entrenamiento sobre la operación de un equipo</div>
+        </div>
+
+        <!-- Indicadores visuales -->
+        <div class="glossary-group">
+          <h4>Indicadores de estado (semáforo)</h4>
+          <div class="glossary-item"><span class="dot dot-ok dot-sample"></span> <strong>Verde</strong> El documento existe en el archivo</div>
+          <div class="glossary-item"><span class="dot dot-partial dot-sample"></span> <strong>Amarillo</strong> El documento existe parcialmente (no en todas las torres o áreas)</div>
+          <div class="glossary-item"><span class="dot dot-miss dot-sample"></span> <strong>Rojo</strong> El documento no existe — debe solicitarse</div>
+          <div class="glossary-item"><span class="dot dot-na dot-sample"></span> <strong>Gris</strong> No aplica para esta ubicación o categoría</div>
+        </div>
+
+        <!-- Etiquetas de estado -->
+        <div class="glossary-group">
+          <h4>Etiquetas de estado</h4>
+          <div class="glossary-item"><span class="status-tag tag-completo">Completo</span> Tiene acta principal (ENT) + registro fotográfico (FOT) + observaciones (OBS)</div>
+          <div class="glossary-item"><span class="status-tag tag-incompleto">Incompleto</span> Tiene acta principal pero le falta al menos un documento complementario</div>
+          <div class="glossary-item"><span class="status-tag tag-sin-acta">Sin acta</span> No se encontró ningún tipo de acta de entrega para este bien o ubicación</div>
+          <div class="glossary-item"><span class="status-tag tag-indirecto">Indirecto</span> No tiene acta propia, pero el bien se inspecciona dentro de las actas de áreas comunes (pasillos, escaleras, etc.)</div>
+          <div class="glossary-item"><span class="status-tag tag-na">N/A</span> No Aplica — esta categoría no requiere acta de entrega (ej. documentos legales)</div>
+        </div>
+
+        <!-- Abreviaturas de ubicación -->
+        <div class="glossary-group">
+          <h4>Abreviaturas de ubicación</h4>
+          <div class="glossary-item"><strong>T1–T18</strong> Torres residenciales del proyecto (18 en total)</div>
+          <div class="glossary-item"><strong>SETI</strong> Cuarto de Servicios de Telecomunicaciones Integrados — cuarto técnico de redes eléctricas y comunicaciones en cubierta</div>
+          <div class="glossary-item"><strong>BBQ</strong> Zona de Barbecue / Asadores</div>
+          <div class="glossary-item"><strong>CAO</strong> Prefijo del proyecto CAOBA de Novaterra P.H.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+<footer>
+  <div class="container">
+    Ingenium Holding Corp S.A.S &copy; <script>document.write(new Date().getFullYear())</script><br>
+    Este portal es confidencial y exclusivo para el Consejo de Administraci&oacute;n de CAOBA de Novaterra P.H.<br>
+    <span style="opacity:0.7">Fuente: inventario_actas_entrega_caoba.csv (485 registros) vs. Bienes Esenciales (20) + No Esenciales (13) &bull; Corte: abril 2026</span>
+  </div>
+</footer>
+
+<script>
+function toggle(id) {
+  const el = document.getElementById(id);
+  const chev = document.getElementById('chev-' + id);
+  el.classList.toggle('collapsed');
+  if (chev) chev.classList.toggle('open');
+}
+
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
